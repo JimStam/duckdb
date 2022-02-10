@@ -1,0 +1,18 @@
+# name: benchmark/publicbi/arade.benchmark
+# description: Perform PublicBI Arade benchmark
+# group: [publicbi]
+
+name Arade
+group publicbi
+storage persistent
+require_reinit
+
+load
+PRAGMA force_compression='bitpacking';
+DROP TABLE IF EXISTS x;
+
+require httpfs
+
+run 
+CREATE TABLE x AS SELECT * FROM read_csv_auto('benchmark/publicbi/Arade_1.csv');
+checkpoint;
