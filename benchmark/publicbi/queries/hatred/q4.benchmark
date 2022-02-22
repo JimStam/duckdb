@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/hatred/q4.benchmark
+# description: Run hatred query 4 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=4
+SUBSET=hatred

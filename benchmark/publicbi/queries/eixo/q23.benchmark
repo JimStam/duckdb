@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/eixo/q23.benchmark
+# description: Run eixo query 23 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=23
+SUBSET=eixo

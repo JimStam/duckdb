@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/commongovernment/q10.benchmark
+# description: Run commongovernment query 10 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=10
+SUBSET=commongovernment

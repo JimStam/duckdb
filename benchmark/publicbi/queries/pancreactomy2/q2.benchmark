@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/pancreactomy2/q2.benchmark
+# description: Run pancreactomy2 query 2 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=2
+SUBSET=pancreactomy2

@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/provider/q29.benchmark
+# description: Run provider query 29 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=29
+SUBSET=provider

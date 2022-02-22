@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/mlb/q51.benchmark
+# description: Run mlb query 51 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=51
+SUBSET=mlb

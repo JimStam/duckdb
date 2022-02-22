@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/citymaxcapita/q9.benchmark
+# description: Run citymaxcapita query 9 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=9
+SUBSET=citymaxcapita

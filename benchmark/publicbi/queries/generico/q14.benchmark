@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/generico/q14.benchmark
+# description: Run generico query 14 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=14
+SUBSET=generico

@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/mulheresmil/q19.benchmark
+# description: Run mulheresmil query 19 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=19
+SUBSET=mulheresmil

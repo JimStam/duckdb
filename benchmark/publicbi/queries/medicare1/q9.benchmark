@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/medicare1/q9.benchmark
+# description: Run medicare1 query 9 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=9
+SUBSET=medicare1

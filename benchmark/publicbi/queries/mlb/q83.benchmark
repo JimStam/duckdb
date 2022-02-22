@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/mlb/q83.benchmark
+# description: Run mlb query 83 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=83
+SUBSET=mlb

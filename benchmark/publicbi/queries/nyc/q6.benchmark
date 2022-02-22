@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/nyc/q6.benchmark
+# description: Run nyc query 6 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=6
+SUBSET=nyc

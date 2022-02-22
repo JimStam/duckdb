@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/iglocations2/q6.benchmark
+# description: Run iglocations2 query 6 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=6
+SUBSET=iglocations2

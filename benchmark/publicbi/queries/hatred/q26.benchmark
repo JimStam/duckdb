@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/hatred/q26.benchmark
+# description: Run hatred query 26 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=26
+SUBSET=hatred

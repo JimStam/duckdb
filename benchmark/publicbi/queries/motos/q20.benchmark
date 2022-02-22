@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/motos/q20.benchmark
+# description: Run motos query 20 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=20
+SUBSET=motos
