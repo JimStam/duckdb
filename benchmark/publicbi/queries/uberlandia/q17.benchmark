@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/uberlandia/q17.benchmark
+# description: Run uberlandia query 17 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=17
+SUBSET=uberlandia

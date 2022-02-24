@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/realestate2/q30.benchmark
+# description: Run realestate2 query 30 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=30
+SUBSET=realestate2

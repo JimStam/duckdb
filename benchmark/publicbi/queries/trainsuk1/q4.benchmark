@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/trainsuk1/q4.benchmark
+# description: Run trainsuk1 query 4 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=4
+SUBSET=trainsuk1

@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/taxpayer/q11.benchmark
+# description: Run taxpayer query 11 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=11
+SUBSET=taxpayer

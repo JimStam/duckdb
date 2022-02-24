@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/tablerosistemapenal/q38.benchmark
+# description: Run tablerosistemapenal query 38 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=38
+SUBSET=tablerosistemapenal

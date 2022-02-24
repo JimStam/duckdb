@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/rentabilidad/q15.benchmark
+# description: Run rentabilidad query 15 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=15
+SUBSET=rentabilidad

@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/salariesfrance/q28.benchmark
+# description: Run salariesfrance query 28 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=28
+SUBSET=salariesfrance

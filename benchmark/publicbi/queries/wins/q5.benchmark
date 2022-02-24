@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/wins/q5.benchmark
+# description: Run wins query 5 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=5
+SUBSET=wins

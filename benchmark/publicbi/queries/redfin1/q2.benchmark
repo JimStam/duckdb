@@ -1,0 +1,7 @@
+# name: benchmark/publicbi/queries/redfin1/q2.benchmark
+# description: Run redfin1 query 2 from the PublicBI benchmark
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark.in
+QUERY_NUMBER=2
+SUBSET=redfin1
