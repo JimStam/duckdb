@@ -224,6 +224,7 @@ string TransactionManager::CommitTransaction(ClientContext &context, Transaction
 	if (checkpoint) {
 		// checkpoint the database to disk
 		auto &storage_manager = StorageManager::GetStorageManager(db);
+		storage_manager.transaction = transaction;
 		storage_manager.CreateCheckpoint(false, true);
 	}
 	return error;

@@ -134,6 +134,7 @@ void StorageManager::CreateCheckpoint(bool delete_wal, bool force_checkpoint) {
 	if (wal.GetWALSize() > 0 || db.config.force_checkpoint || force_checkpoint) {
 		// we only need to checkpoint if there is anything in the WAL
 		CheckpointManager checkpointer(db);
+		checkpointer.transaction = transaction;
 		checkpointer.CreateCheckpoint();
 	}
 	if (delete_wal) {

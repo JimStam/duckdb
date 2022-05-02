@@ -1263,7 +1263,7 @@ unique_ptr<BaseStatistics> DataTable::GetStatistics(ClientContext &context, colu
 //===--------------------------------------------------------------------===//
 // Checkpoint
 //===--------------------------------------------------------------------===//
-BlockPointer DataTable::Checkpoint(TableDataWriter &writer) {
+BlockPointer DataTable::Checkpoint(TableDataWriter &writer, Transaction *transaction) {
 	// checkpoint each individual row group
 	// FIXME: we might want to combine adjacent row groups in case they have had deletions...
 	vector<unique_ptr<BaseStatistics>> global_stats;
@@ -1274,7 +1274,7 @@ BlockPointer DataTable::Checkpoint(TableDataWriter &writer) {
 	auto row_group = (RowGroup *)row_groups->GetRootSegment();
 	vector<RowGroupPointer> row_group_pointers;
 	while (row_group) {
-		auto pointer = row_group->Checkpoint(writer, global_stats);
+		auto pointer = row_group->Checkpoint(writer, global_stats, transaction);
 		row_group_pointers.push_back(move(pointer));
 		row_group = (RowGroup *)row_group->next.get();
 	}

@@ -57,6 +57,7 @@ public:
 	unique_ptr<MetaBlockWriter> tabledata_writer;
 
 public:
+	Transaction *transaction;
 	//! Checkpoint the current state of the WAL and flush it to the main storage. This should be called BEFORE any
 	//! connction is available because right now the checkpointing cannot be done online. (TODO)
 	void CreateCheckpoint();

@@ -18,7 +18,7 @@ TableDataWriter::~TableDataWriter() {
 
 BlockPointer TableDataWriter::WriteTableData() {
 	// start scanning the table and append the data to the uncompressed segments
-	return table.storage->Checkpoint(*this);
+	return table.storage->Checkpoint(*this, transaction);
 }
 
 CompressionType TableDataWriter::GetColumnCompressionType(idx_t i) {

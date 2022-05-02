@@ -331,6 +331,7 @@ void CheckpointManager::WriteTable(TableCatalogEntry &table) {
 	table.Serialize(*metadata_writer);
 	// now we need to write the table data
 	TableDataWriter writer(db, *this, table, *tabledata_writer);
+	writer.transaction = transaction;
 	auto pointer = writer.WriteTableData();
 
 	//! write the block pointer for the table info

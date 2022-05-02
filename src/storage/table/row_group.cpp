@@ -31,7 +31,7 @@ struct RowGroupSortBindData : public FunctionData {
 
 	vector<LogicalType> types;
 	vector<column_t> indexes;
-	
+
 	DatabaseInstance &db;
 	BufferManager &buffer_manager;
 	unique_ptr<GlobalSortState> global_sort_state;
@@ -41,19 +41,20 @@ struct RowGroupSortBindData : public FunctionData {
 	unique_ptr<FunctionData> Copy() override;
 };
 
-RowGroupSortBindData::RowGroupSortBindData(vector<LogicalType> types_p, vector<column_t> indexes_p, DatabaseInstance &db_p)
+RowGroupSortBindData::RowGroupSortBindData(vector<LogicalType> types_p, vector<column_t> indexes_p,
+                                           DatabaseInstance &db_p)
     : types(types_p), indexes(indexes_p), db(db_p), buffer_manager(BufferManager::GetBufferManager(db_p)) {
 
 	// create BoundOrderByNode per column to sort
 	for (idx_t i = 0; i < types.size(); ++i) {
-		orders.emplace_back(OrderType::ASCENDING, OrderByNullType::NULLS_LAST, 
+		orders.emplace_back(OrderType::ASCENDING, OrderByNullType::NULLS_LAST,
 		                    make_unique<BoundReferenceExpression>(types[i], indexes[i]));
 	}
 
 	// create payload layout
 	payload_layout.Initialize(types);
 
-	// initialize the global sort state	
+	// initialize the global sort state
 	global_sort_state = make_unique<GlobalSortState>(buffer_manager, orders, payload_layout);
 }
 
@@ -490,7 +491,7 @@ void RowGroup::ScanCommitted(RowGroupScanState &state, DataChunk &result, TableS
 	}
 }
 
-bool RowGroup::ScanToDataChunks(RowGroupScanState &state, DataChunk &result) {
+bool RowGroup::ScanToDataChunks(RowGroupScanState &state, DataChunk &result, Transaction *transaction) {
 	auto &column_ids = state.parent.column_ids;
 	while (true) {
 		if (state.vector_index * STANDARD_VECTOR_SIZE >= state.max_row) {
@@ -503,7 +504,7 @@ bool RowGroup::ScanToDataChunks(RowGroupScanState &state, DataChunk &result) {
 		idx_t count;
 		count = max_count;
 
-		// scan all vectors completely: full scan without deletions or table filters
+		// scan all vectors completely
 		for (idx_t i = 0; i < column_ids.size(); i++) {
 			auto column = column_ids[i];
 			if (column == COLUMN_IDENTIFIER_ROW_ID) {
@@ -511,8 +512,7 @@ bool RowGroup::ScanToDataChunks(RowGroupScanState &state, DataChunk &result) {
 				D_ASSERT(result.data[i].GetType().InternalType() == ROW_TYPE);
 				result.data[i].Sequence(this->start + current_row, 1);
 			} else {
-				columns[column]->ScanCommitted(state.vector_index, state.column_scans[i], result.data[i],
-				                               false);
+				columns[column]->Scan(*transaction, state.vector_index, state.column_scans[i], result.data[i]);
 			}
 		}
 
@@ -528,9 +528,10 @@ bool RowGroup::ScanToDataChunks(RowGroupScanState &state, DataChunk &result) {
 	return true;
 }
 
-void RowGroup::SortColumns(vector<LogicalType> &types, vector<column_t> &column_ids) {
+void RowGroup::SortColumns(vector<LogicalType> &types, vector<column_t> &column_ids, Transaction *transaction) {
 	vector<LogicalType> key_types;
 
+	D_ASSERT(transaction);
 	// Initialize the scan states
 	TableScanState scan_state;
 	scan_state.column_ids = column_ids;
@@ -538,13 +539,13 @@ void RowGroup::SortColumns(vector<LogicalType> &types, vector<column_t> &column_
 	vector<idx_t> cardinalities;
 
 	// Calculate the column cardinalities
-//	CalculateCardinalitiesCorrelation1(types, scan_state, cardinalities);
+	//	CalculateCardinalitiesCorrelation1(types, scan_state, cardinalities);
 
 	// Get types for the key column
-//	for (auto i : cardinalities) {
-//		cardinalities[i] = i;
-//		key_types.push_back(types[i]);
-//	}
+	//	for (auto i : cardinalities) {
+	//		cardinalities[i] = i;
+	//		key_types.push_back(types[i]);
+	//	}
 
 	for (idx_t i = 0; i < types.size(); i++) {
 		cardinalities.push_back(i);
@@ -552,10 +553,8 @@ void RowGroup::SortColumns(vector<LogicalType> &types, vector<column_t> &column_
 	}
 
 	// Initialize DataChunk for key columns and payload (the entire RowGroup)
-	DataChunk keys;
-	DataChunk payload;
-	keys.Initialize(key_types);
-	payload.Initialize(types);
+	vector<unique_ptr<DataChunk>> keys;
+	vector<unique_ptr<DataChunk>> payload;
 
 	// Initialize the sorting states
 	RowGroupSortBindData sort_state(types, column_ids, db);
@@ -566,20 +565,31 @@ void RowGroup::SortColumns(vector<LogicalType> &types, vector<column_t> &column_
 	// Scan the RowGroup into the DataChunks
 	bool next_chunk = true;
 	InitializeScan(scan_state.row_group_scan_state);
+
 	while (next_chunk) {
-		next_chunk = ScanToDataChunks(scan_state.row_group_scan_state, payload);
+		unique_ptr<DataChunk> keys_chunk = make_unique<DataChunk>();
+		unique_ptr<DataChunk> payload_chunk = make_unique<DataChunk>();
+
+		keys_chunk->Initialize(key_types);
+		payload_chunk->Initialize(types);
+
+		next_chunk = ScanToDataChunks(scan_state.row_group_scan_state, *payload_chunk, transaction);
 
 		// If column cardinality == 1, use the key column for sorting
 		for (idx_t i = 0; i < cardinalities.size(); i++) {
-			keys.data[i].Reference(payload.data[cardinalities[i]]);
-			keys.SetCardinality(payload.size());
+			keys_chunk->data[i].Reference(payload_chunk->data[cardinalities[i]]);
+			keys_chunk->SetCardinality(payload_chunk->size());
 		}
-		local_sort_state.SinkChunk(keys, payload);
+		local_sort_state.SinkChunk(*keys_chunk, *payload_chunk);
 
 		// Do not continue sort if payload is empty
-		if (payload.size() == 0) {
+		if (payload_chunk->size() == 0) {
+			payload.push_back(move(payload_chunk));
+			keys.push_back(move(keys_chunk));
 			return;
 		}
+		payload.push_back(move(payload_chunk));
+		keys.push_back(move(keys_chunk));
 	}
 
 	// add local state to global state, which sorts the data
@@ -616,7 +626,8 @@ void RowGroup::SortColumns(vector<LogicalType> &types, vector<column_t> &column_
 	this->Verify();
 }
 
-void RowGroup::CalculateCardinalitiesCorrelation1(vector<LogicalType> &types, TableScanState &scan_state, vector<idx_t> &cardinalities) {
+void RowGroup::CalculateCardinalitiesCorrelation1(vector<LogicalType> &types, TableScanState &scan_state,
+                                                  vector<idx_t> &cardinalities) {
 	// Scan the RowGroup to calculate cardinality - initialize a HyperLogLog for each column and add values
 	DataChunk result;
 	result.Initialize(types);
@@ -625,7 +636,8 @@ void RowGroup::CalculateCardinalitiesCorrelation1(vector<LogicalType> &types, Ta
 
 	bool next_chunk = true;
 	while (next_chunk) {
-		next_chunk = ScanToDataChunks(scan_state.row_group_scan_state, result);
+		// FIXME: gotta get a transaction here
+		next_chunk = ScanToDataChunks(scan_state.row_group_scan_state, result, nullptr);
 		for (idx_t i = 0; i < columns.size(); i++) {
 			logs[i].Add(result.data[i].GetData(), sizeof(types[i].InternalType()));
 		}
@@ -644,7 +656,7 @@ void RowGroup::CalculateCardinalitiesCorrelation1(vector<LogicalType> &types, Ta
 			cardinalities.push_back(0);
 			continue;
 		}
-		merged_log = logs[i-1].Merge(logs[i]);
+		merged_log = logs[i - 1].Merge(logs[i]);
 		current_count = merged_log->Count();
 
 		if (current_count > max_cardinality) {
@@ -862,7 +874,9 @@ void RowGroup::MergeStatistics(idx_t column_idx, BaseStatistics &other) {
 	stats[column_idx]->statistics->Merge(other);
 }
 
-RowGroupPointer RowGroup::Checkpoint(TableDataWriter &writer, vector<unique_ptr<BaseStatistics>> &global_stats) {
+RowGroupPointer RowGroup::Checkpoint(TableDataWriter &writer, vector<unique_ptr<BaseStatistics>> &global_stats,
+                                     Transaction *transaction) {
+	D_ASSERT(transaction);
 	vector<unique_ptr<ColumnCheckpointState>> states;
 	states.reserve(columns.size());
 	vector<LogicalType> types;
@@ -887,7 +901,7 @@ RowGroupPointer RowGroup::Checkpoint(TableDataWriter &writer, vector<unique_ptr<
 		}
 
 		if (!contains_illegal_types && !columns.empty() && count != 0) {
-			SortColumns(types, column_ids);
+			SortColumns(types, column_ids, transaction);
 		}
 	}
 

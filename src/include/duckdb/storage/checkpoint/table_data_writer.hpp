@@ -23,6 +23,7 @@ class TableDataWriter {
 	friend class ColumnData;
 
 public:
+	Transaction *transaction;
 	TableDataWriter(DatabaseInstance &db, CheckpointManager &checkpoint_manager, TableCatalogEntry &table,
 	                MetaBlockWriter &meta_writer);
 	~TableDataWriter();
