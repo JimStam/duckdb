@@ -1,0 +1,13 @@
+# name: ${FILE_PATH}
+# description: ${DESCRIPTION}
+# group: [publicbi]
+
+name PUBLICBI_${SUBSET}_${QUERY_NUMBER}
+group publicbi
+
+require httpfs
+
+load benchmark/publicbi/data/${SUBSET}/load.sql
+
+run
+CHECKPOINT;

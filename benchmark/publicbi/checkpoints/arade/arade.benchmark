@@ -1,0 +1,6 @@
+# name: benchmark/publicbi/checkpoints/arade/arade.benchmark
+# description: Load arade from the PublicBI benchmark and check checkpointing time
+# group: [publicbi]
+
+template benchmark/publicbi/publicbi.benchmark-checkpoint-time.in
+SUBSET=arade
