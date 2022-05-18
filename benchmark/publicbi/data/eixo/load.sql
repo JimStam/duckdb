@@ -82,4 +82,4 @@ CREATE TABLE "Eixo_1"(
 );
 
 
-INSERT INTO Eixo_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Eixo_1.csv.gz');
+COPY Eixo_1 FROM 'benchmark/publicbi/Eixo_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

@@ -1,13 +1,13 @@
 # name: ${FILE_PATH}
 # description: ${DESCRIPTION}
-# group: [publicbi]
+# group: [publicbi-compression]
 
 name PUBLICBI_${SUBSET}_${QUERY_NUMBER}
-group publicbi
-
-require httpfs
+group publicbi-compression
 
 load benchmark/publicbi/data/${SUBSET}/load.sql
 
 run
 CHECKPOINT;
+
+cleanup benchmark/publicbi/data/${SUBSET}/drop.sql

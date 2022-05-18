@@ -20,4 +20,4 @@ CREATE TABLE "IGlocations1_1"(
 );
 
 
-INSERT INTO IGlocations1_1 SELECT * FROM read_csv_auto('benchmark/publicbi/IGlocations1_1.csv.gz');
+COPY IGlocations1_1 FROM 'benchmark/publicbi/IGlocations1_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

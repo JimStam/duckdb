@@ -31,4 +31,4 @@ CREATE TABLE "Medicare3_1"(
 );
 
 
-INSERT INTO Medicare3_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Medicare3_1.csv.gz');
+COPY Medicare3_1 FROM 'benchmark/publicbi/Medicare3_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

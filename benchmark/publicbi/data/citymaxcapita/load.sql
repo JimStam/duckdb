@@ -33,4 +33,4 @@ CREATE TABLE "CityMaxCapita_1"(
 );
 
 
-INSERT INTO CityMaxCapita_1 SELECT * FROM read_csv_auto('benchmark/publicbi/CityMaxCapita_1.csv.gz');
+COPY CityMaxCapita_1 FROM 'benchmark/publicbi/CityMaxCapita_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

@@ -13,4 +13,4 @@ CREATE TABLE "Arade_1"(
 );
 
 
-INSERT INTO Arade_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Arade_1.csv.gz');
+COPY Arade_1 FROM 'benchmark/publicbi/Arade_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

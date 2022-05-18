@@ -29,4 +29,4 @@ CREATE TABLE "IUBLibrary_1"(
 );
 
 
-INSERT INTO IUBLibrary_1 SELECT * FROM read_csv_auto('benchmark/publicbi/IUBLibrary_1.csv.gz');
+COPY IUBLibrary_1 FROM 'benchmark/publicbi/IUBLibrary_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

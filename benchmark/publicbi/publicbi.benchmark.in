@@ -11,4 +11,4 @@ load benchmark/publicbi/data/${SUBSET}/load.sql
 
 run benchmark/publicbi/data/${SUBSET}/queries/${QUERY_NUMBER}.sql
 
-result benchmark/publicbi/data/${SUBSET}/answers/${QUERY_NUMBER}.csv
+result benchmark/publicbi/results/${SUBSET}/queries-monetdb/${QUERY_NUMBER}.csv

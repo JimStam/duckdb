@@ -99,5 +99,5 @@ CREATE TABLE "Redfin3_2"(
 );
 
 
-INSERT INTO Redfin3_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Redfin3_1.csv.gz');
-INSERT INTO Redfin3_2 SELECT * FROM read_csv_auto('benchmark/publicbi/Redfin3_2.csv.gz');
+COPY Redfin3_1 FROM 'benchmark/publicbi/Redfin3_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY Redfin3_2 FROM 'benchmark/publicbi/Redfin3_2.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

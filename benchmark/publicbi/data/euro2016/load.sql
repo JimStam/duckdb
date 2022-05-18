@@ -13,4 +13,4 @@ CREATE TABLE "Euro2016_1"(
 );
 
 
-INSERT INTO Euro2016_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Euro2016_1.csv.gz');
+COPY Euro2016_1 FROM 'benchmark/publicbi/Euro2016_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

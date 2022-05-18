@@ -8,4 +8,4 @@ CREATE TABLE "Food_1"(
 );
 
 
-INSERT INTO Food_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Food_1.csv.gz');
+COPY Food_1 FROM 'benchmark/publicbi/Food_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

@@ -83,4 +83,4 @@ CREATE TABLE "MulheresMil_1"(
 );
 
 
-INSERT INTO MulheresMil_1 SELECT * FROM read_csv_auto('benchmark/publicbi/MulheresMil_1.csv.gz');
+COPY MulheresMil_1 FROM 'benchmark/publicbi/MulheresMil_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

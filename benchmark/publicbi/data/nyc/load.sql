@@ -113,5 +113,5 @@ CREATE TABLE "NYC_2"(
 );
 
 
-INSERT INTO NYC_1 SELECT * FROM read_csv_auto('benchmark/publicbi/NYC_1.csv.gz');
-INSERT INTO NYC_2 SELECT * FROM read_csv_auto('benchmark/publicbi/NYC_2.csv.gz');
+COPY NYC_1 FROM 'benchmark/publicbi/NYC_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY NYC_2 FROM 'benchmark/publicbi/NYC_2.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

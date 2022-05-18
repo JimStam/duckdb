@@ -93,5 +93,5 @@ CREATE TABLE "Motos_2"(
 );
 
 
-INSERT INTO Motos_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Motos_1.csv.gz');
-INSERT INTO Motos_2 SELECT * FROM read_csv_auto('benchmark/publicbi/Motos_2.csv.gz');
+COPY Motos_1 FROM 'benchmark/publicbi/Motos_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY Motos_2 FROM 'benchmark/publicbi/Motos_2.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

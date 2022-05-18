@@ -83,4 +83,4 @@ CREATE TABLE "Uberlandia_1"(
 );
 
 
-INSERT INTO Uberlandia_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Uberlandia_1.csv.gz');
+COPY Uberlandia_1 FROM 'benchmark/publicbi/Uberlandia_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

@@ -57,5 +57,5 @@ CREATE TABLE "CMSprovider_1"(
 );
 
 
-INSERT INTO CMSprovider_2 SELECT * FROM read_csv_auto('benchmark/publicbi/CMSprovider_2.csv.gz');
-INSERT INTO CMSprovider_1 SELECT * FROM read_csv_auto('benchmark/publicbi/CMSprovider_1.csv.gz');
+COPY CMSprovider_2 FROM 'benchmark/publicbi/CMSprovider_2.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY CMSprovider_1 FROM 'benchmark/publicbi/CMSprovider_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

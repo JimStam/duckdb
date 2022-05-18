@@ -14,4 +14,4 @@ CREATE TABLE "Bimbo_1"(
 );
 
 
-INSERT INTO Bimbo_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Bimbo_1.csv.gz');
+COPY Bimbo_1 FROM 'benchmark/publicbi/Bimbo_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

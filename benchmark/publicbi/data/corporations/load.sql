@@ -29,4 +29,4 @@ CREATE TABLE "Corporations_1"(
 );
 
 
-INSERT INTO Corporations_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Corporations_1.csv.gz');
+COPY Corporations_1 FROM 'benchmark/publicbi/Corporations_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

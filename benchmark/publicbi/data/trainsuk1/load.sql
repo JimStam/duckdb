@@ -29,7 +29,7 @@ CREATE TABLE "TrainsUK1_4"(
   "Calculation_0430624152715434" varchar(69) NOT NULL
 );
 
-CREATE TABLE "TrainsUK1_3"(
+CREATE TABLE "TrainsUK1_2"(
   "Average Lateness" double NOT NULL,
   "Calculation_2040623161253421" decimal(4, 2) NOT NULL,
   "Calculation_2890421151640665" varchar(18) NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE "TrainsUK1_1"(
   "Test" smallint NOT NULL
 );
 
-CREATE TABLE "TrainsUK1_2"(
+CREATE TABLE "TrainsUK1_3"(
   "Average Lateness" double NOT NULL,
   "Calculation_2040623161253421" decimal(4, 2) NOT NULL,
   "Calculation_2890421151640665" varchar(18) NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE "TrainsUK1_2"(
 );
 
 
-INSERT INTO TrainsUK1_4 SELECT * FROM read_csv_auto('benchmark/publicbi/TrainsUK1_4.csv.gz');
-INSERT INTO TrainsUK1_3 SELECT * FROM read_csv_auto('benchmark/publicbi/TrainsUK1_3.csv.gz');
-INSERT INTO TrainsUK1_1 SELECT * FROM read_csv_auto('benchmark/publicbi/TrainsUK1_1.csv.gz');
-INSERT INTO TrainsUK1_2 SELECT * FROM read_csv_auto('benchmark/publicbi/TrainsUK1_2.csv.gz');
+COPY TrainsUK1_4 FROM 'benchmark/publicbi/TrainsUK1_4.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY TrainsUK1_2 FROM 'benchmark/publicbi/TrainsUK1_2.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY TrainsUK1_1 FROM 'benchmark/publicbi/TrainsUK1_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY TrainsUK1_3 FROM 'benchmark/publicbi/TrainsUK1_3.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

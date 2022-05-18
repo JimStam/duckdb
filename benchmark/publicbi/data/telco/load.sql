@@ -183,4 +183,4 @@ CREATE TABLE "Telco_1"(
 );
 
 
-INSERT INTO Telco_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Telco_1.csv.gz');
+COPY Telco_1 FROM 'benchmark/publicbi/Telco_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

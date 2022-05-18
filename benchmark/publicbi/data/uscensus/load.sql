@@ -1,4 +1,4 @@
-CREATE TABLE "USCensus_2"(
+CREATE TABLE "USCensus_3"(
   "ACCESS" smallint,
   "ACR" smallint,
   "ADJHSG" integer NOT NULL,
@@ -520,7 +520,7 @@ CREATE TABLE "USCensus_2"(
   "Agep (bin)" smallint NOT NULL
 );
 
-CREATE TABLE "USCensus_3"(
+CREATE TABLE "USCensus_2"(
   "ACCESS" smallint,
   "ACR" smallint,
   "ADJHSG" integer NOT NULL,
@@ -1565,6 +1565,6 @@ CREATE TABLE "USCensus_1"(
 );
 
 
-INSERT INTO USCensus_2 SELECT * FROM read_csv_auto('benchmark/publicbi/USCensus_2.csv.gz');
-INSERT INTO USCensus_3 SELECT * FROM read_csv_auto('benchmark/publicbi/USCensus_3.csv.gz');
-INSERT INTO USCensus_1 SELECT * FROM read_csv_auto('benchmark/publicbi/USCensus_1.csv.gz');
+COPY USCensus_3 FROM 'benchmark/publicbi/USCensus_3.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY USCensus_2 FROM 'benchmark/publicbi/USCensus_2.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY USCensus_1 FROM 'benchmark/publicbi/USCensus_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

@@ -103,4 +103,4 @@ CREATE TABLE "HashTags_1"(
 );
 
 
-INSERT INTO HashTags_1 SELECT * FROM read_csv_auto('benchmark/publicbi/HashTags_1.csv.gz');
+COPY HashTags_1 FROM 'benchmark/publicbi/HashTags_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

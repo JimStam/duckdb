@@ -1,6 +1,6 @@
 # name: benchmark/publicbi/checkpoints/yalelanguages/yalelanguages.benchmark
 # description: Load yalelanguages from the PublicBI benchmark and check checkpointing time
-# group: [publicbi]
+# group: [publicbi-compression]
 
 template benchmark/publicbi/publicbi.benchmark-checkpoint-time.in
 SUBSET=yalelanguages

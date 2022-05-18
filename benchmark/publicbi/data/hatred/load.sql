@@ -33,4 +33,4 @@ CREATE TABLE "Hatred_1"(
 );
 
 
-INSERT INTO Hatred_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Hatred_1.csv.gz');
+COPY Hatred_1 FROM 'benchmark/publicbi/Hatred_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

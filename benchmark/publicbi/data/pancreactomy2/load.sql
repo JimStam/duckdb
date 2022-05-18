@@ -63,5 +63,5 @@ CREATE TABLE "PanCreactomy2_2"(
 );
 
 
-INSERT INTO PanCreactomy2_1 SELECT * FROM read_csv_auto('benchmark/publicbi/PanCreactomy2_1.csv.gz');
-INSERT INTO PanCreactomy2_2 SELECT * FROM read_csv_auto('benchmark/publicbi/PanCreactomy2_2.csv.gz');
+COPY PanCreactomy2_1 FROM 'benchmark/publicbi/PanCreactomy2_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
+COPY PanCreactomy2_2 FROM 'benchmark/publicbi/PanCreactomy2_2.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

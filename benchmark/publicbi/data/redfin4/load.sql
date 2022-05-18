@@ -50,4 +50,4 @@ CREATE TABLE "Redfin4_1"(
 );
 
 
-INSERT INTO Redfin4_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Redfin4_1.csv.gz');
+COPY Redfin4_1 FROM 'benchmark/publicbi/Redfin4_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );

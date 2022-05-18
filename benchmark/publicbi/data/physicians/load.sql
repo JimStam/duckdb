@@ -30,4 +30,4 @@ CREATE TABLE "Physicians_1"(
 );
 
 
-INSERT INTO Physicians_1 SELECT * FROM read_csv_auto('benchmark/publicbi/Physicians_1.csv.gz');
+COPY Physicians_1 FROM 'benchmark/publicbi/Physicians_1.csv.gz' ( DELIMITER '|', NULL 'null', QUOTE '', ESCAPE '\\n' );
