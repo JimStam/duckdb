@@ -160,10 +160,15 @@ private:
 	static void CheckpointDeletes(VersionNode *versions, Serializer &serializer);
 	static shared_ptr<VersionNode> DeserializeDeletes(Deserializer &source);
 
-	CompressionType DetectBestCompressionMethod(idx_t &compression_idx, idx_t &col_idx,
-	                                            CompressionType compression_type);
+	void ForceCompression(vector<CompressionFunction *> &compression_functions, CompressionType compression_type);
 
-	vector<CompressionType> DetectBestCompressionMethodTable(TableDataWriter &writer);
+	CompressionType DetectBestCompressionMethod(idx_t &col_idx, CompressionType compression_type,
+	                                            vector<unique_ptr<AnalyzeState>> &states,
+	                                            vector<idx_t> &compression_idxs);
+
+	vector<CompressionType> DetectBestCompressionMethodTable(TableDataWriter &writer,
+	                                                         vector<unique_ptr<AnalyzeState>> &analyze_states,
+	                                                         vector<idx_t> &compression_idxs);
 
 private:
 	mutex row_group_lock;

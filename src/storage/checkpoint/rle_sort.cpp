@@ -1,5 +1,4 @@
 #include "duckdb/storage/checkpoint/rle_sort.hpp"
-
 #include "duckdb/storage/table/column_data.hpp"
 namespace duckdb {
 

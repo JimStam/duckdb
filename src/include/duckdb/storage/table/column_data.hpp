@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "duckdb/common/types/data_chunk.hpp"
 #include "duckdb/storage/table/append_state.hpp"
 #include "duckdb/storage/table/scan_state.hpp"
@@ -30,7 +32,15 @@ struct DataTableInfo;
 
 struct ColumnCheckpointInfo {
 	ColumnCheckpointInfo(CompressionType compression_type_p) : compression_type(compression_type_p) {};
+	ColumnCheckpointInfo(CompressionType compression_type_p, idx_t compression_idx_p,
+	                     unique_ptr<AnalyzeState> analyze_state_p)
+	    : compression_type(compression_type_p), compression_idx(compression_idx_p),
+	      analyze_state(move(analyze_state_p)) {};
 	CompressionType compression_type;
+	//! Vector containing the compression idx if already analyzed
+	idx_t compression_idx;
+	//! Vector containing the analyze states if already analyzed
+	unique_ptr<AnalyzeState> analyze_state;
 };
 
 class ColumnData {

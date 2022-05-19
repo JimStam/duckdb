@@ -57,7 +57,7 @@ void ColumnDataCheckpointer::ScanSegments(const std::function<void(Vector &, idx
 
 void ColumnDataCheckpointer::ForceCompression(vector<CompressionFunction *> &compression_functions,
                                               CompressionType compression_type) {
-	// On of the force_compression flags has been set
+	// One of the force_compression flags has been set
 	// check if this compression method is available
 	bool found = false;
 	for (idx_t i = 0; i < compression_functions.size(); i++) {
@@ -153,17 +153,22 @@ void ColumnDataCheckpointer::WriteToDisk() {
 		}
 	}
 
-	// TODO: Scan column to DataChunk then update each Segment like in RLE::WriteValue
 	ScanSegments([&](Vector &scan_vector, idx_t count) {
-		// TODO: Rewrite when the scan vector does a callback
 		VectorData vdata;
 		scan_vector.Orrify(count, vdata);
 	});
 
 	// now we need to write our segment
 	// we will first run an analyze step that determines which compression function to use
+	// We must analyze if this is a validity mask
 	idx_t compression_idx;
-	auto analyze_state = DetectBestCompressionMethod(compression_idx);
+	unique_ptr<AnalyzeState> analyze_state;
+	if (is_validity) {
+		analyze_state = DetectBestCompressionMethod(compression_idx);
+	} else {
+		compression_idx = checkpoint_info.compression_idx;
+		analyze_state = move(checkpoint_info.analyze_state);
+	}
 
 	if (!analyze_state) {
 		throw InternalException("No suitable compression/storage method found to store column");
