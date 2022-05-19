@@ -1,7 +1,0 @@
-# name: benchmark/publicbi/queries/hashtags/q7.benchmark
-# description: Run hashtags query 7 from the PublicBI benchmark
-# group: [publicbi]
-
-template benchmark/publicbi/publicbi.benchmark.in
-QUERY_NUMBER=7
-SUBSET=hashtags

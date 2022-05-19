@@ -1,7 +1,0 @@
-# name: benchmark/publicbi/queries/rentabilidad/q11.benchmark
-# description: Run rentabilidad query 11 from the PublicBI benchmark
-# group: [publicbi]
-
-template benchmark/publicbi/publicbi.benchmark.in
-QUERY_NUMBER=11
-SUBSET=rentabilidad
