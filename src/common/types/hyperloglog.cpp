@@ -203,7 +203,7 @@ void TemplatedComputeHashes(VectorData &vdata, const idx_t &count, uint64_t hash
 	}
 }
 
-static void ComputeHashes(VectorData &vdata, const LogicalType &type, uint64_t hashes[], idx_t count) {
+void ComputeHashes(VectorData &vdata, const LogicalType &type, uint64_t hashes[], idx_t count) {
 	switch (type.InternalType()) {
 	case PhysicalType::BOOL:
 	case PhysicalType::INT8:

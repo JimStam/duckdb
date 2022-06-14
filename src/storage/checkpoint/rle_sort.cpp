@@ -176,6 +176,9 @@ void RLESort::CalculateCardinalities(vector<HyperLogLog> &logs, vector<std::tupl
 	case RLESortOption::CARDINALITY_BELOW_FIVE_HUNDRED:
 		CardinalityBelowTenPercent(logs, cardinalities);
 		break;
+	case RLESortOption::COMBINED_CARDINALITIES:
+		CombinedCardinalities(logs, cardinalities);
+		break;
 	default:
 		throw InternalException("Unrecognized sorting option");
 	}
@@ -189,6 +192,33 @@ void RLESort::CardinalityBelowTenPercent(vector<HyperLogLog> &logs, vector<std::
 		cardinalities.emplace_back(current_count, key_column_ids[i]);
 	}
 	std::sort(cardinalities.begin(), cardinalities.end());
+}
+
+void RLESort::CombinedCardinalities(vector<HyperLogLog> &logs, vector<std::tuple<idx_t, idx_t>> &cardinalities) {
+	// First, scan the entire RowGroup into one DataChunk so we can compute the hash per column
+	DataChunk final_result;
+	final_result.Initialize(payload_column_types);
+	while (scan_state.row_group_scan_state.vector_index * STANDARD_VECTOR_SIZE <
+	       scan_state.row_group_scan_state.max_row) {
+		DataChunk result;
+		result.Initialize(payload_column_types);
+		row_group.ScanCommitted(scan_state.row_group_scan_state, result,
+		                        TableScanType::TABLE_SCAN_COMMITTED_ROWS_OMIT_PERMANENTLY_DELETED_CHECKPOINT);
+		result.Normalify();
+		final_result.Append(result);
+	}
+	// The ComputeHashes function requires VectorData thus we Orrify the DataChunk
+	auto orrified_vector_data = final_result.Orrify();
+	auto vector_data = orrified_vector_data.get();
+
+	// Compute the hashes for each key column and store them in an array
+	uint64_t hashes_per_column[10][STANDARD_VECTOR_SIZE * 120];
+	for (idx_t i = 0; i < key_column_ids.size(); i++) {
+		auto key_column_id = key_column_ids[i];
+		ComputeHashes(vector_data[key_column_id], key_column_types[i], hashes_per_column[key_column_id], final_result.size());
+	}
+
+	// XOR the hashes of columns and run the rest of the algorithm
 }
 
 unique_ptr<RowGroup> RLESort::CreateSortedRowGroup(GlobalSortState &global_sort_state) {

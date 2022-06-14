@@ -63,4 +63,6 @@ private:
 	void *hll;
 	mutex lock;
 };
+
+void ComputeHashes(VectorData &vdata, const LogicalType &type, uint64_t hashes[], idx_t count);
 } // namespace duckdb

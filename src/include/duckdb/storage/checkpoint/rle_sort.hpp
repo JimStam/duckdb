@@ -68,6 +68,10 @@ private:
 	// Retrieve all columns with a cardinality < 500, sorted from lowest to highest cardinality
 	void CardinalityBelowTenPercent(vector<HyperLogLog> &logs, vector<std::tuple<idx_t, idx_t>> &cardinalities);
 
+	// Use the combined cardinalities of multiple columns (unique entries in multiple columns)
+	// to find the optimal sorting order
+	void CombinedCardinalities(vector<HyperLogLog> &logs, vector<std::tuple<idx_t, idx_t>> &cardinalities);
+
 	// Filter out key columns which will not be sorted on
 	void FilterKeyColumns();
 
