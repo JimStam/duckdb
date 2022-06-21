@@ -9,7 +9,7 @@ require_reinit
 
 load
 PRAGMA force_compression='rle';
-PRAGMA force_compression_sorting=true;
+PRAGMA force_compression_sorting=false;
 DROP TABLE IF EXISTS table_1;
 
 run
