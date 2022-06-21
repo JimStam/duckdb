@@ -39,8 +39,7 @@ RowGroupSortBindData::~RowGroupSortBindData() {
 
 RLESort::RLESort(RowGroup &row_group, DataTable &data_table, vector<CompressionType> table_compression)
     : row_group(row_group), data_table(data_table), old_count(row_group.count) {
-	// Reorder columns to optimize RLE Compression - We skip if the table has indexes, is empty or has a large amount
-	// of columns
+	// Reorder columns to optimize RLE Compression - We skip if the table has indexes or is empty
 	if (row_group.db.config.force_compression_sorting && row_group.count != 0 && row_group.table_info.indexes.Empty()) {
 		// collect logical types by iterating the columns
 		for (idx_t column_idx = 0; column_idx < row_group.columns.size(); column_idx++) {
@@ -120,7 +119,9 @@ void RLESort::SinkKeysPayloadSort() {
 void RLESort::ReplaceRowGroup(RowGroup &sorted_rowgroup) {
 	// We have to delete from the data table the difference of chunk counts
 	// These refer to deleted tuples
-	data_table.total_rows -= row_group.count - new_count;
+	idx_t total_rows = data_table.GetTotalRows();
+	total_rows -= row_group.count - new_count;
+	data_table.SetTotalRows(total_rows);
 	row_group.columns = sorted_rowgroup.columns;
 	row_group.stats = sorted_rowgroup.stats;
 	row_group.version_info = sorted_rowgroup.version_info;
@@ -186,14 +187,17 @@ void RLESort::CardinalityBelowTenPercent(vector<HyperLogLog> &logs, vector<std::
 	for (idx_t i = 0; i < logs.size(); i++) {
 		auto current_count = logs[i].Count();
 		// Do not use column if above a certain cardinality
-		cardinalities.emplace_back(current_count, key_column_ids[i]);
+		if (current_count < 10000) {
+			cardinalities.emplace_back(current_count, key_column_ids[i]);
+		}
 	}
 	std::sort(cardinalities.begin(), cardinalities.end());
 }
 
 unique_ptr<RowGroup> RLESort::CreateSortedRowGroup(GlobalSortState &global_sort_state) {
 	// Initialize sorted rowgroup
-	auto sorted_rowgroup = make_unique<RowGroup>(row_group.db, row_group.table_info, data_table.prev_end, new_count);
+	auto sorted_rowgroup =
+	    make_unique<RowGroup>(row_group.db, row_group.table_info, data_table.GetPrevEnd(), new_count);
 	sorted_rowgroup->InitializeEmpty(payload_column_types);
 	TableAppendState append_state;
 	sorted_rowgroup->InitializeAppendInternal(append_state.row_group_append_state, new_count);
@@ -207,6 +211,7 @@ unique_ptr<RowGroup> RLESort::CreateSortedRowGroup(GlobalSortState &global_sort_
 		result_chunk.SetCardinality(0);
 		scanner.Scan(result_chunk);
 		if (result_chunk.size() == 0) {
+			// No data was sorted
 			break;
 		}
 		result_chunk.SetCardinality(result_chunk.size());
@@ -219,17 +224,22 @@ unique_ptr<RowGroup> RLESort::CreateSortedRowGroup(GlobalSortState &global_sort_
 void RLESort::Sort() {
 	if (key_column_ids.empty()) {
 		// Nothing to sort on
-		data_table.prev_end += row_group.count;
+		int64_t prev_end = data_table.GetPrevEnd();
+		prev_end += row_group.count;
+		data_table.SetPrevEnd(prev_end);
 		return;
 	}
-	// Check if there are any transient segments or if persistent segments have changes
+	// Check if there are any transient segments or if persistent segments have changes - otherwise data is already
+	// on disk, and we do not need to sort
 	for (idx_t column_idx : key_column_ids) {
 		if (row_group.columns[column_idx]->HasChanges(row_group.start)) {
 			// There were changes in the RowGroup - break the for loop and start the sort
 			break;
 		}
 		// None of the key columns had any changes, no need to sort again
-		data_table.prev_end += row_group.count;
+		int64_t prev_end = data_table.GetPrevEnd();
+		prev_end += row_group.count;
+		data_table.SetPrevEnd(prev_end);
 		return;
 	}
 
@@ -239,7 +249,9 @@ void RLESort::Sort() {
 	SinkKeysPayloadSort();
 	if (new_count == 0) {
 		// No changes
-		data_table.prev_end += row_group.count;
+		int64_t prev_end = data_table.GetPrevEnd();
+		prev_end += row_group.count;
+		data_table.SetPrevEnd(prev_end);
 		return;
 	}
 
@@ -248,19 +260,23 @@ void RLESort::Sort() {
 	global_sort_state.AddLocalState(local_sort_state);
 	global_sort_state.PrepareMergePhase();
 
-	// Clean old persistent segments of this RowGroup to rewrite the new ones
+	// Clean old persistent segments of this RowGroup to ensure the old blocks are overwritten
 	for (idx_t column_idx = 0; column_idx < row_group.columns.size(); column_idx++) {
 		row_group.columns[column_idx]->CleanPersistentSegments();
 	}
 
 	// scan the sorted row data and add to the sorted row group
 	int64_t count_change = new_count - old_count;
-	data_table.rows_changed += count_change;
+	int64_t rows_changed = data_table.GetRowsChanged();
+	rows_changed += count_change;
+	data_table.SetRowsChanged(rows_changed);
 
 	// Initialize Sorted Row Group
 	auto sorted_rowgroup = CreateSortedRowGroup(global_sort_state);
 
-	data_table.prev_end += new_count;
+	int64_t prev_end = data_table.GetPrevEnd();
+	prev_end += row_group.count;
+	data_table.SetPrevEnd(prev_end);
 	ReplaceRowGroup(*sorted_rowgroup);
 }
 } // namespace duckdb
