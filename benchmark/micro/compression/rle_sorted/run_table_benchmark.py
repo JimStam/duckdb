@@ -26,3 +26,5 @@ for file in sorted(os.listdir(".")):
         final_averages.append(average_run_time)
 
 print(final_averages)
+with open(f"results.txt", 'w') as txt_file:
+    txt_file.write(str(final_averages))
