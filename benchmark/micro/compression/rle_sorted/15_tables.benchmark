@@ -1,0 +1,45 @@
+# name: benchmark/micro/compression/rle_sorted/15_tables.benchmark
+# description: Sorting RLE compressed table and checkpointing
+# group: [rle_sorted]
+
+name RLE sort 15 table
+group rle_sorted
+storage persistent
+require_reinit
+
+load
+PRAGMA force_compression='rle';
+PRAGMA force_compression_sorting=true;
+DROP TABLE IF EXISTS table_1;
+DROP TABLE IF EXISTS table_2;
+DROP TABLE IF EXISTS table_3;
+DROP TABLE IF EXISTS table_4;
+DROP TABLE IF EXISTS table_5;
+DROP TABLE IF EXISTS table_6;
+DROP TABLE IF EXISTS table_7;
+DROP TABLE IF EXISTS table_8;
+DROP TABLE IF EXISTS table_9;
+DROP TABLE IF EXISTS table_10;
+DROP TABLE IF EXISTS table_11;
+DROP TABLE IF EXISTS table_12;
+DROP TABLE IF EXISTS table_13;
+DROP TABLE IF EXISTS table_14;
+DROP TABLE IF EXISTS table_15;
+
+run
+CREATE TABLE table_1 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_2 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_3 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_4 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_5 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_6 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_7 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_8 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_9 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_10 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_11 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_12 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_13 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_14 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_15 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+checkpoint;
