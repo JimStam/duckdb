@@ -65,4 +65,5 @@ private:
 };
 
 void ComputeHashes(VectorData &vdata, const LogicalType &type, uint64_t hashes[], idx_t count);
+void ComputeIndexAndCount(uint64_t &hash, uint8_t &prefix);
 } // namespace duckdb

@@ -136,8 +136,8 @@ void RLESort::FilterKeyColumns() {
 	// Vector for the cardinalities with: Tuple(cardinality, column_id)
 	vector<std::tuple<idx_t, idx_t>> cardinalities;
 
-	ScanColumnsToHLL(logs);
-	CalculateCardinalities(logs, cardinalities, RLESortOption::CARDINALITY_BELOW_FIVE_HUNDRED);
+//	ScanColumnsToHLL(logs);
+	CalculateCardinalities(logs, cardinalities, RLESortOption::COMBINED_CARDINALITIES);
 
 	// Clear the old key columns
 	key_column_ids.clear();
@@ -210,15 +210,27 @@ void RLESort::CombinedCardinalities(vector<HyperLogLog> &logs, vector<std::tuple
 	// The ComputeHashes function requires VectorData thus we Orrify the DataChunk
 	auto orrified_vector_data = final_result.Orrify();
 	auto vector_data = orrified_vector_data.get();
+	auto count = final_result.size();
 
 	// Compute the hashes for each key column and store them in an array
-	uint64_t hashes_per_column[10][STANDARD_VECTOR_SIZE * 120];
+	uint64_t hashes_per_column[5][STANDARD_VECTOR_SIZE * 120];
+	uint8_t counts_per_column[5][STANDARD_VECTOR_SIZE * 120];
 	for (idx_t i = 0; i < key_column_ids.size(); i++) {
 		auto key_column_id = key_column_ids[i];
-		ComputeHashes(vector_data[key_column_id], key_column_types[i], hashes_per_column[key_column_id], final_result.size());
+		ComputeHashes(vector_data[key_column_id], key_column_types[i], hashes_per_column[key_column_id], count);
 	}
 
-	// XOR the hashes of columns and run the rest of the algorithm
+	uint64_t hashes[STANDARD_VECTOR_SIZE * 120];
+	uint8_t counts[STANDARD_VECTOR_SIZE * 120];
+	HyperLogLog log;
+	// XOR the hashes of columns and compute index and count
+	for (idx_t i = 0; i < count; i++) {
+		hashes[i] = hashes_per_column[0][i] ^ hashes_per_column[1][i];
+		ComputeIndexAndCount(hashes[i], counts[i]);
+	}
+	log.AddToLog(vector_data[1], count, hashes, counts);
+	auto final_log_count = log.Count();
+	auto x = 0;
 }
 
 unique_ptr<RowGroup> RLESort::CreateSortedRowGroup(GlobalSortState &global_sort_state) {

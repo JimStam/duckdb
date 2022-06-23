@@ -241,7 +241,7 @@ static inline uint8_t CountTrailingZeros(uint64_t &x) {
 	return LOOKUP[(DEBRUIJN * (x ^ (x - 1))) >> 58];
 }
 
-static inline void ComputeIndexAndCount(uint64_t &hash, uint8_t &prefix) {
+void ComputeIndexAndCount(uint64_t &hash, uint8_t &prefix) {
 	uint64_t index = hash & ((1 << 12) - 1); /* Register index. */
 	hash >>= 12;                             /* Remove bits used to address the register. */
 	hash |= ((uint64_t)1 << (64 - 12));      /* Make sure the count will be <= Q+1. */
