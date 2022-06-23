@@ -1,0 +1,19 @@
+# name: benchmark/micro/compression/rle_sorted/02_tables.benchmark
+# description: Sorting RLE compressed table and checkpointing
+# group: [rle_sorted]
+
+name RLE sort 2 table
+group rle_sorted
+storage persistent
+require_reinit
+
+load
+PRAGMA force_compression='rle';
+PRAGMA force_compression_sorting=false;
+DROP TABLE IF EXISTS table_1;
+DROP TABLE IF EXISTS table_2;
+
+run
+CREATE TABLE table_1 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+CREATE TABLE table_2 AS SELECT i % 2 AS i FROM range(0, 10000000) tbl(i);
+checkpoint;
