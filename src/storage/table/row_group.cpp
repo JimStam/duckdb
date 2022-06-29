@@ -13,11 +13,9 @@
 #include "duckdb/storage/checkpoint/table_data_writer.hpp"
 #include "duckdb/storage/meta_block_reader.hpp"
 #include "duckdb/storage/table/column_data.hpp"
-#include "duckdb/storage/table/standard_column_data.hpp"
 #include "duckdb/storage/table/update_segment.hpp"
 #include "duckdb/transaction/transaction.hpp"
 #include "duckdb/transaction/transaction_manager.hpp"
-#include "duckdb/main/database.hpp"
 #include "duckdb/storage/checkpoint/rle_sort.hpp"
 
 namespace duckdb {
@@ -709,17 +707,17 @@ bool CompressionForTypeExists(PhysicalType type) {
 	return false;
 }
 
-CompressionType RowGroup::DetectBestCompressionMethod(idx_t &compression_idx, idx_t &col_idx,
+std::tuple<CompressionType, idx_t> RowGroup::DetectBestCompressionMethod(idx_t &compression_idx, idx_t &col_idx,
                                                       CompressionType compression_type) {
 	if (compression_type != CompressionType::COMPRESSION_AUTO) {
-		return compression_type;
+		return std::make_tuple(compression_type, 1);
 	}
 	auto &config = DBConfig::GetConfig(db);
 	if (config.force_compression != CompressionType::COMPRESSION_AUTO) {
-		return config.force_compression;
+		return std::make_tuple(config.force_compression, 1);
 	}
 	if (!CompressionForTypeExists(columns[col_idx]->type.InternalType())) {
-		return CompressionType::COMPRESSION_AUTO;
+		return std::make_tuple(CompressionType::COMPRESSION_AUTO, 1);
 	}
 	vector<CompressionFunction *> compression_functions =
 	    db.config.GetCompressionFunctions(columns[col_idx]->type.InternalType());
@@ -772,11 +770,11 @@ CompressionType RowGroup::DetectBestCompressionMethod(idx_t &compression_idx, id
 		}
 	}
 	//	return state;
-	return compression_functions[compression_idx]->type;
+	return std::tuple<CompressionType, idx_t>(compression_functions[compression_idx]->type, best_score);
 }
 
-vector<CompressionType> RowGroup::DetectBestCompressionMethodTable(TableDataWriter &writer) {
-	vector<CompressionType> table_compression;
+vector<std::tuple<CompressionType, idx_t>> RowGroup::DetectBestCompressionMethodTable(TableDataWriter &writer) {
+	vector<std::tuple<CompressionType, idx_t>> table_compression;
 	for (idx_t i = 0; i < columns.size(); i++) {
 		idx_t compression_idx = 0;
 		CompressionType compression_type = writer.GetColumnCompressionType(i);

@@ -35,7 +35,7 @@ struct RowGroupSortBindData : public FunctionData {
 
 class RLESort {
 public:
-	RLESort(RowGroup &row_group, DataTable &data_table, vector<CompressionType> table_compression);
+	RLESort(RowGroup &row_group, DataTable &data_table, vector<std::tuple<CompressionType, idx_t>> table_compression);
 	void Sort();
 
 private:
@@ -45,6 +45,8 @@ private:
 	// Key Columns (i.e., columns to sort on)
 	vector<LogicalType> key_column_types;
 	vector<column_t> key_column_ids;
+	// Compression score
+	vector<idx_t> key_column_scores;
 
 	// Payload Columns (i.e., whole table)
 	vector<LogicalType> payload_column_types;
@@ -60,6 +62,9 @@ private:
 
 	// Logical Types supported in the payload
 	bool SupportedPayloadType(LogicalTypeId type_id);
+
+	// Check if the new RLE scores are better after sorting
+	bool NewScoresBetter(RowGroup &sorted_rowgroup);
 
 	// Calculate the cardinalities with a chosen option
 	void CalculateCardinalities(vector<HyperLogLog> &logs, vector<std::tuple<idx_t, idx_t>> &cardinalities,

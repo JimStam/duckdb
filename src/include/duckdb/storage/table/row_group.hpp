@@ -152,10 +152,10 @@ private:
 	static void CheckpointDeletes(VersionNode *versions, Serializer &serializer);
 	static shared_ptr<VersionNode> DeserializeDeletes(Deserializer &source);
 
-	CompressionType DetectBestCompressionMethod(idx_t &compression_idx, idx_t &col_idx,
+	std::tuple<CompressionType, idx_t> DetectBestCompressionMethod(idx_t &compression_idx, idx_t &col_idx,
 	                                            CompressionType compression_type);
 
-	vector<CompressionType> DetectBestCompressionMethodTable(TableDataWriter &writer);
+	vector<std::tuple<CompressionType, idx_t>> DetectBestCompressionMethodTable(TableDataWriter &writer);
 
 private:
 	mutex row_group_lock;
