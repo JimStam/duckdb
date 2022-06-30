@@ -773,12 +773,19 @@ std::tuple<CompressionType, idx_t> RowGroup::DetectBestCompressionMethod(idx_t &
 	return std::tuple<CompressionType, idx_t>(compression_functions[compression_idx]->type, best_score);
 }
 
-vector<std::tuple<CompressionType, idx_t>> RowGroup::DetectBestCompressionMethodTable(TableDataWriter &writer) {
-	vector<std::tuple<CompressionType, idx_t>> table_compression;
+vector<CompressionType> RowGroup::DetectBestCompressionMethodTable(TableDataWriter &writer, idx_t &total_score) {
+	vector<CompressionType> table_compression;
 	for (idx_t i = 0; i < columns.size(); i++) {
 		idx_t compression_idx = 0;
 		CompressionType compression_type = writer.GetColumnCompressionType(i);
-		table_compression.push_back(DetectBestCompressionMethod(compression_idx, i, compression_type));
+
+		// Get the compression type and score for the column
+		std::tuple<CompressionType, idx_t> compression_type_and_score;
+		compression_type_and_score = DetectBestCompressionMethod(compression_idx, i, compression_type);
+
+		// Add it to the global counter and vector
+		table_compression.push_back(std::get<0>(compression_type_and_score));
+		total_score += std::get<1>(compression_type_and_score);
 	}
 	return table_compression;
 }
@@ -786,11 +793,12 @@ vector<std::tuple<CompressionType, idx_t>> RowGroup::DetectBestCompressionMethod
 RowGroupPointer RowGroup::Checkpoint(TableDataWriter &writer, vector<unique_ptr<BaseStatistics>> &global_stats,
                                      DataTable &data_table) {
 	vector<unique_ptr<ColumnCheckpointState>> states;
+	idx_t total_score = 0;
 	states.reserve(columns.size());
 	if (db.config.force_compression_sorting) {
 		// Sorts columns to optimize RLE compression
-		auto table_compression = DetectBestCompressionMethodTable(writer);
-		RLESort rle_checkpoint_sort(*this, data_table, table_compression);
+		auto table_compression = DetectBestCompressionMethodTable(writer, total_score);
+		RLESort rle_checkpoint_sort(*this, data_table, writer,table_compression, total_score);
 		rle_checkpoint_sort.Sort();
 	}
 

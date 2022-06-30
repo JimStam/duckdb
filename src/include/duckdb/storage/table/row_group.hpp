@@ -155,7 +155,7 @@ private:
 	std::tuple<CompressionType, idx_t> DetectBestCompressionMethod(idx_t &compression_idx, idx_t &col_idx,
 	                                            CompressionType compression_type);
 
-	vector<std::tuple<CompressionType, idx_t>> DetectBestCompressionMethodTable(TableDataWriter &writer);
+	vector<CompressionType> DetectBestCompressionMethodTable(TableDataWriter &writer, idx_t &total_score);
 
 private:
 	mutex row_group_lock;

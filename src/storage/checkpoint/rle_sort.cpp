@@ -37,8 +37,8 @@ bool RowGroupSortBindData::Equals(const FunctionData &other) const {
 RowGroupSortBindData::~RowGroupSortBindData() {
 }
 
-RLESort::RLESort(RowGroup &row_group, DataTable &data_table, vector<std::tuple<CompressionType, idx_t>> table_compression)
-    : row_group(row_group), data_table(data_table), old_count(row_group.count) {
+RLESort::RLESort(RowGroup &row_group, DataTable &data_table, TableDataWriter &writer,vector<CompressionType> table_compression, idx_t &previous_score)
+    : row_group(row_group), data_table(data_table), writer(writer), previous_score(previous_score), old_count(row_group.count) {
 	// Reorder columns to optimize RLE Compression - We skip if the table has indexes or is empty
 	if (row_group.db.config.force_compression_sorting && row_group.count != 0 && row_group.table_info.indexes.Empty()) {
 		// collect logical types by iterating the columns
@@ -47,11 +47,10 @@ RLESort::RLESort(RowGroup &row_group, DataTable &data_table, vector<std::tuple<C
 			auto type_id = column->type.id();
 			auto column_compression = table_compression[column_idx];
 			// We basically only sort columns with RLE compression and that are supported by the RLE algorithm
-			if (SupportedKeyType(type_id) && (std::get<0>(column_compression) == CompressionType::COMPRESSION_RLE)) {
+			if (SupportedKeyType(type_id) && (column_compression == CompressionType::COMPRESSION_RLE)) {
 				// Gather types and ids of key columns (i.e., the ones we will sort on)
 				key_column_ids.push_back(column_idx);
 				key_column_types.push_back(column->type);
-				key_column_scores.push_back(std::get<1>(column_compression));
 			}
 			if (!SupportedPayloadType(type_id)) {
 				// We don't support RLE reordering on this table
@@ -87,17 +86,14 @@ bool RLESort::SupportedPayloadType(LogicalTypeId type_id) {
 
 bool RLESort::NewScoresBetter(RowGroup &sorted_rowgroup) {
 	// Before replacing - check if RLE compression is better
-	for (idx_t i = 0; i < key_column_ids.size(); i++) {
-		idx_t compression_idx = 0;
-		CompressionType compression_type = CompressionType::COMPRESSION_RLE;
-		idx_t score = std::get<1>(sorted_rowgroup.DetectBestCompressionMethod(compression_idx, key_column_ids[i], compression_type));
+	idx_t total_score = 0;
+	sorted_rowgroup.DetectBestCompressionMethodTable(writer, total_score);
 
-		if (score > key_column_scores[i]) {
-			// Do not sort if the new score is higher than the old one
-			return false;
-		}
+	// A lower score = fewer bytes = better compression
+	if (total_score < previous_score) {
+		return true;
 	}
-	return true;
+	return false;
 }
 
 void RLESort::InitializeScan() {

@@ -35,18 +35,19 @@ struct RowGroupSortBindData : public FunctionData {
 
 class RLESort {
 public:
-	RLESort(RowGroup &row_group, DataTable &data_table, vector<std::tuple<CompressionType, idx_t>> table_compression);
+	RLESort(RowGroup &row_group, DataTable &data_table, TableDataWriter &writer,vector<CompressionType> table_compression, idx_t &previous_score);
 	void Sort();
 
 private:
 	RowGroup &row_group;
 	DataTable &data_table;
+	TableDataWriter &writer;
 
 	// Key Columns (i.e., columns to sort on)
 	vector<LogicalType> key_column_types;
 	vector<column_t> key_column_ids;
-	// Compression score
-	vector<idx_t> key_column_scores;
+	// The previous total compression score
+	idx_t previous_score;
 
 	// Payload Columns (i.e., whole table)
 	vector<LogicalType> payload_column_types;
