@@ -47,18 +47,21 @@ RLESort::RLESort(RowGroup &row_group, DataTable &data_table, TableDataWriter &wr
 			auto type_id = column->type.id();
 			auto column_compression = table_compression[column_idx];
 			// We basically only sort columns with RLE compression and that are supported by the RLE algorithm
-			if (SupportedKeyType(type_id) && (column_compression == CompressionType::COMPRESSION_RLE)) {
-				// Gather types and ids of key columns (i.e., the ones we will sort on)
-				key_column_ids.push_back(column_idx);
-				key_column_types.push_back(column->type);
-			}
-			if (!SupportedPayloadType(type_id)) {
-				// We don't support RLE reordering on this table
-				key_column_ids.clear();
-				key_column_types.clear();
-				return;
-			}
+//			if (SupportedKeyType(type_id) && (column_compression == CompressionType::COMPRESSION_RLE)) {
+//				// Gather types and ids of key columns (i.e., the ones we will sort on)
+//				key_column_ids.push_back(column_idx);
+//				key_column_types.push_back(column->type);
+//			}
+//			if (!SupportedPayloadType(type_id)) {
+//				// We don't support RLE reordering on this table
+//				key_column_ids.clear();
+//				key_column_types.clear();
+//				return;
+//			}
 			// Gather types and ids of payload columns (i.e., the whole table)
+			key_column_ids.push_back(column_idx);
+			key_column_types.push_back(column->type);
+
 			payload_column_ids.push_back(column_idx);
 			payload_column_types.push_back(column->type);
 		}
